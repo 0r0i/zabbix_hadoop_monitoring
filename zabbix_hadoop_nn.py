@@ -379,9 +379,9 @@ if __name__ == "__main__":
 
     ----------------------'''))
 
-    parser.add_argument('-hh', '--hadoop-host-name', help='Hadoop Hostname/IP to connect to get JSON file.', required=True)
-    parser.add_argument('-hp', '--hadoop-host-port', help='Hadoop Hostname/IP Port to connect to.', required=True)
-    parser.add_argument('-zh', '--zabbix-host-name', help='Hostname as in the Zabbix server.', required=True)
+    parser.add_argument('-hh', '--hadoop-host-name', help='Hadoop Hostname/IP to connect to get JSON file.')
+    parser.add_argument('-hp', '--hadoop-host-port', default=50070, help='Hadoop Hostname/IP Port to connect to. (default=50070)')
+    parser.add_argument('-zh', '--zabbix-host-name', help='Hostname as in the Zabbix server.')
 
     subparsers = parser.add_subparsers(help='sub-command help')
 
@@ -400,7 +400,11 @@ if __name__ == "__main__":
 
     str_cmd = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 send-data -zp 10051 -zi 10.231.67.201'.split()
     str_cmd2 = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 xml-gen -zp 10050 -zi 10.20.6.31 -zg Linux_Server -za hadoop'.split()
-    args = parser.parse_args()
+    str_help_xml = '-hh hmhdmaster1 -zh hmhdmaster1 xml-gen --help'.split()
+    str_help_send = '-hh hmhdmaster1 -zh hmhdmaster1 send-data --help'.split()
+
+
+    args = parser.parse_args(str_help_xml)
 
     type_proc = ''
     try:
