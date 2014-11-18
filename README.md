@@ -48,7 +48,7 @@ OR
                     --zabbix-host-application hadoop
 
 
-## Step 2 : Sending Data to Zabbix Server.
+### Step 2 : Sending Data to Zabbix Server.
 
 Once we have created all the Items in the server.
 Then we need send data to those items. 
