@@ -169,20 +169,24 @@ def processing_json(category, json_data, module_name):
             # If we have dictinary then we create key/value of that dictionary.
             elif isinstance(json_data['beans'][item][key], dict):
                 for value_in_sub in json_data['beans'][item][key]:
-                    zbx_key = re.sub('[\[\]/=*:\.,\'\"><]', '', str(module_name[item] + '_' + key + '_' + value_in_sub).strip())
+                    zbx_key = re.sub('[\[\]/=*:\.,\'\"><]', '', str(module_name[item] + '_' +
+                                        key + '_' + value_in_sub).strip())
                     zbx_value = json_data['beans'][item][key][value_in_sub]
                     send_value[zbx_key] = zbx_value
-                    logging.debug("Adding Key/Value to Dictionary, Key : " + str(zbx_key) + " / Value : " + str(zbx_value))
+                    logging.debug("Adding Key/Value to Dictionary, Key : " +
+                                        str(zbx_key) + " / Value : " + str(zbx_value))
 
             # This is specific processing for LiveNodes
             if key == "LiveNodes":
                 dict_v = ast.literal_eval(json_data['beans'][item][key])
                 for key_live in dict_v:
                     for item_live in dict_v[key_live]:
-                        zbx_key = re.sub('[\[\]/=*:\.,\'\"><]', '', str(module_name[item] + '_' + key + '_' + key_live + '_' + item_live).strip())
+                        zbx_key = re.sub('[\[\]/=*:\.,\'\"><]', '', str(module_name[item] + '_' +
+                                            key + '_' + key_live + '_' + item_live).strip())
                         zbx_value = dict_v[key_live][item_live]
                         send_value[zbx_key] = zbx_value
-                        logging.debug("Adding Key/Value to Dictionary, Key : " + str(zbx_key) + " / Value : " + str(zbx_value))
+                        logging.debug("Adding Key/Value to Dictionary, Key : " +
+                                            str(zbx_key) + " / Value : " + str(zbx_value))
     return send_value
 
 
@@ -537,7 +541,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # create the top-level parser
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent('''
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     description=textwrap.dedent('''
 
     Namenode Zabbix Monitoring
     ----------------------
@@ -554,17 +559,22 @@ if __name__ == "__main__":
     ----------------------'''))
 
     parser.add_argument('-hh', '--hadoop-host-name', help='Hadoop Hostname/IP to connect to get JSON file.')
-    parser.add_argument('-hp', '--hadoop-host-port', default=50070, help='Hadoop Hostname/IP Port to connect to. (default=50070)')
+    parser.add_argument('-hp', '--hadoop-host-port', default=50070,
+                                help='Hadoop Hostname/IP Port to connect to. (default=50070)')
     parser.add_argument('-zh', '--zabbix-host-name', help='Hostname as in the Zabbix server.')
 
     subparsers = parser.add_subparsers(help='sub-command help')
 
     # create the parser for the "xml-generator" command
     parser_a = subparsers.add_parser('xml-gen', help='\'xml-gen --help\' for more options')
-    parser_a.add_argument('-zp', '--zabbix-host-port', help='Host port as as in the Zabbix server. (Monitoring host)', required=True)
-    parser_a.add_argument('-zi', '--zabbix-host-interface', help='Host Interface as as in the Zabbix server.. (Monitoring host)', required=True)
-    parser_a.add_argument('-zg', '--zabbix-host-group', help='Host Group as in the Zabbix server. (Monitoring host)', required=True)
-    parser_a.add_argument('-za', '--zabbix-host-application', help='Host Application as in the Zabbix server. (Monitoring host)', required=True)
+    parser_a.add_argument('-zp', '--zabbix-host-port',
+                                help='Host port as as in the Zabbix server. (Monitoring host)', required=True)
+    parser_a.add_argument('-zi', '--zabbix-host-interface',
+                                help='Host Interface as as in the Zabbix server.. (Monitoring host)', required=True)
+    parser_a.add_argument('-zg', '--zabbix-host-group',
+                                help='Host Group as in the Zabbix server. (Monitoring host)', required=True)
+    parser_a.add_argument('-za', '--zabbix-host-application',
+                                help='Host Application as in the Zabbix server. (Monitoring host)', required=True)
 
 
     # create the parser for the "send-data" command
@@ -573,7 +583,8 @@ if __name__ == "__main__":
     parser_b.add_argument('-zi', '--zabbix-server-ip', help='Zabbix server IP to send the Data to.', required=True)
 
     str_cmd = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 send-data -zp 10051 -zi 10.231.67.201'.split()
-    str_cmd2 = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 xml-gen -zp 10050 -zi 10.20.6.31 -zg Linux_Server -za hadoop'.split()
+    str_cmd2 = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 xml-gen -zp 10050 ' \
+               '-zi 10.20.6.31 -zg Linux_Server -za hadoop'.split()
     str_help_xml = '-hh hmhdmaster1 -zh hmhdmaster1 xml-gen --help'.split()
     str_help_send = '-hh hmhdmaster1 -zh hmhdmaster1 send-data --help'.split()
 
