@@ -605,22 +605,23 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers(help='sub-command help')
 
     # create the parser for the "xml-generator" command
-    parser_a = subparsers.add_parser('xml-gen', help='\'xml-gen --help\' for more options')
-    parser_a.add_argument('-zp', '--zabbix-host-port',
+    parser_xml_gen = subparsers.add_parser('xml-gen', help='\'xml-gen --help\' for more options')
+    parser_xml_gen.add_argument('-zp', '--zabbix-host-port',
                                 help='Host port as as in the Zabbix server. (Monitoring host)', required=True)
-    parser_a.add_argument('-zi', '--zabbix-host-interface',
+    parser_xml_gen.add_argument('-zi', '--zabbix-host-interface',
                                 help='Host Interface as as in the Zabbix server.. (Monitoring host)', required=True)
-    parser_a.add_argument('-zg', '--zabbix-host-group',
+    parser_xml_gen.add_argument('-zg', '--zabbix-host-group',
                                 help='Host Group as in the Zabbix server. (Monitoring host)', required=True)
-    parser_a.add_argument('-za', '--zabbix-host-application',
+    parser_xml_gen.add_argument('-za', '--zabbix-host-application',
                                 help='Host Application as in the Zabbix server. (Monitoring host)', required=True)
 
 
     # create the parser for the "send-data" command
-    parser_b = subparsers.add_parser('send-data', help='\'send-data --help\' for more options')
-    parser_b.add_argument('-zp', '--zabbix-port', default=10051, help='Zabbix port for sending data, default=10051')
-    parser_b.add_argument('-zi', '--zabbix-server-ip', help='Zabbix server IP to send the Data to.', required=True)
+    parser_send_data = subparsers.add_parser('send-data', help='\'send-data --help\' for more options')
+    parser_send_data.add_argument('-zp', '--zabbix-port', default=10051, help='Zabbix port for sending data, default=10051')
+    parser_send_data.add_argument('-zi', '--zabbix-server-ip', help='Zabbix server IP to send the Data to.', required=True)
 
+    # For Testing
     str_cmd = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 send-data -zp 10051 -zi 10.231.67.201'.split()
     str_cmd2 = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 -p namenode.properties xml-gen -zp 10050 ' \
                '-zi 10.20.6.31 -zg Linux_Server -za hadoop'.split()
