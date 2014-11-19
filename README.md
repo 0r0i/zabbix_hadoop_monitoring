@@ -68,7 +68,7 @@ OR
 2. Also '#' in the begining of the file is treated as comment line.
 3. Lines without any information are ignored.
 
-![Updating Properties File](./images/Properties_file.PNG "Update Properties File")
+![Updating Properties File](./images/Properties_File.PNG "Update Properties File")
 
 #### Step 1.4 Import XML create Above, select only below options while importing.
 
