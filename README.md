@@ -39,11 +39,11 @@ Still looking into creating application using the XML file, till then this will 
 
 Now to generate the xml file we will need the below command.
 
-    python <file>.py -hh hmhdmaster1 -hp 50070 -zh hmhdmaster1  -p namenode.properties \
+    python zabbix_hadoop_nn.py -hh hmhdmaster1 -hp 50070 -zh hmhdmaster1  -p namenode.properties \
                      xml-gen -zp 10050 -zi 10.20.6.31 -zg Linux_Server -za hadoop
 OR   
  
-    python <file>.py --hadoop-host-name hmhdmaster1 --hadoop-host-port 50070 \
+    python zabbix_hadoop_nn.py --hadoop-host-name hmhdmaster1 --hadoop-host-port 50070 \
                     --zabbix-host-name hmhdmaster1 --properties-file namenode.properties \
                     xml-gen --zabbix-host-port 10050 --zabbix-host-interface 10.20.6.31 \
                     --zabbix-host-group Linux_Server --zabbix-host-application hadoop
@@ -84,11 +84,11 @@ OR
 Once we have created all the Items in the server.
 Then we need send data to those items. 
 
-    python <file>.py -hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 -p namenode.properties \
+    python zabbix_hadoop_nn.py -hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 -p namenode.properties \
                         send-data -zp 10051 -zi 10.231.67.201
 OR
 
-    python <file>.py --hadoop-host-name hmhdmaster1 --hadoop-host-port 50070 \
+    python zabbix_hadoop_nn.py --hadoop-host-name hmhdmaster1 --hadoop-host-port 50070 \
                      --zabbix-host-name hmhdmaster1 --properties-file namenode.properties --zabbix-port 10051 \
                      --zabbix-server-ip 10.231.67.201
     

@@ -628,7 +628,7 @@ if __name__ == "__main__":
     str_help_send = '-hh hmhdmaster1 -zh hmhdmaster1 send-data --help'.split()
 
 
-    args = parser.parse_args(['-h'])
+    args = parser.parse_args()
 
     #
     # TODO : Dirty code to check 'SEND' or 'Create XML'.
