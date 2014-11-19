@@ -29,7 +29,7 @@ def temp_json_loading():
     This is a temp json loader for testing.
     :return: json data
     """
-    file_desc = open('namenode_jmx.json', 'r+')
+    file_desc = open('resources/namenode_jmx.json', 'r+')
     data = json.load(file_desc)
     return data
 
@@ -77,7 +77,7 @@ def generate_module_dictionary(category_to_process, data):
 def get_url(server_name, listen_port):
     """
         Generating URL to get the information
-        from namenode/datanode
+        from namenode/namenode
 
     :param server_name:
     :param listen_port:
@@ -102,7 +102,7 @@ def get_url(server_name, listen_port):
 def load_url_as_dictionary(url):
     """
         Loading JSON URL which we recieved from
-        namenode/datanode
+        namenode/namenode
 
     :param url:
     :return:
@@ -556,12 +556,12 @@ def get_json_data_as_kv(hp_host_name, hp_host_port, properties_file):
     :return:
     """
     category_to_process = read_properties_file(properties_file)
-    url_to_query = get_url(hp_host_name, hp_host_port)
-    logging.debug('URL to Query : ' + url_to_query)
+    # url_to_query = get_url(hp_host_name, hp_host_port)
+    # logging.debug('URL to Query : ' + url_to_query)
+    #
+    # json_data = load_url_as_dictionary(url_to_query)
 
-    json_data = load_url_as_dictionary(url_to_query)
-
-    #json_data = temp_json_loading()
+    json_data = temp_json_loading()
     create_modules = generate_module_dictionary(category_to_process, json_data)
     ready_dictionary = processing_json(category_to_process, json_data, create_modules)
 
@@ -574,7 +574,7 @@ def get_json_data_as_kv(hp_host_name, hp_host_port, properties_file):
 if __name__ == "__main__":
 
     # Setting Log Level
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
 
     # create the top-level parser
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -590,7 +590,7 @@ if __name__ == "__main__":
     2. Send monitoring data to Zabbix server.
 
     Parameter which are monitored are in the indexes of the JSON and are as below.
-    category_to_process = Taken from the properties file namenode/datanode.properties
+    category_to_process = Taken from the properties file namenode/namenode.properties
 
     ----------------------'''))
 
@@ -622,14 +622,15 @@ if __name__ == "__main__":
     parser_send_data.add_argument('-zi', '--zabbix-server-ip', help='Zabbix server IP to send the Data to.', required=True)
 
     # For Testing
-    str_cmd = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 send-data -zp 10051 -zi 10.231.67.201'.split()
-    str_cmd2 = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 -p namenode.properties xml-gen -zp 10050 ' \
+    str_cmd = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 ' \
+              '-p resources/namenode.properties send-data -zp 10051 -zi 10.231.67.201'.split()
+    str_cmd2 = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 -p resources/namenode.properties xml-gen -zp 10050 ' \
                '-zi 10.20.6.31 -zg Linux_Server -za hadoop'.split()
     str_help_xml = '-hh hmhdmaster1 -zh hmhdmaster1 xml-gen --help'.split()
     str_help_send = '-hh hmhdmaster1 -zh hmhdmaster1 send-data --help'.split()
 
 
-    args = parser.parse_args()
+    args = parser.parse_args(str_cmd)
 
     #
     # TODO : Dirty code to check 'SEND' or 'Create XML'.
