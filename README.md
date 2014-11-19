@@ -34,8 +34,8 @@ Below are the categories which are being monitored.
 
 In the Zabbix Export xml files as well we have created seperated application for each of the Categories above.
 
-*NOTE: We need to create these Application names in the Zabbix Server before we upload the XML to the server.
-Still looking into creating application using the XML file, till then this will be manual task :(.*
+**NOTE: We need to create these Application names in the Zabbix Server before we upload the XML to the server.
+Still looking into creating application using the XML file, till then this will be manual task :(.**
 
 Now to generate the xml file we will need the below command.
 
