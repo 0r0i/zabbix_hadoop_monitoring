@@ -20,12 +20,40 @@ import re
 import zbxsend  # This package can be installed from : https://github.com/zubayr/zbxsend
 
 
+# ---------------------------------
+# Temp JSON loader function
+# returns - json_data for processing
+# ---------------------------------
 def temp_json_loading():
+    """
+    This is a temp json loader for testing.
+    :return: json data
+    """
     file_desc = open('namenode_jmx.json', 'r+')
     data = json.load(file_desc)
     return data
 
+
+# ---------------------------------
+# Generate Module Dictionary from Category List.
+# returns - key/value module info
+# ---------------------------------
 def generate_module_dictionary(category_to_process, data):
+    """
+        This Function generates module dictionary from the JSON.
+        We select specific modules we need to process, and use them.
+
+        Module indices are mention in the list 'category_to_process'
+        'data' is the json, which we use to extract these parameters.
+
+        Returns key/value pair information
+        key : ModuleName
+        Value :
+
+    :param category_to_process:
+    :param data:
+    :return:
+    """
     module_name = dict()
     for item in category_to_process:
         for key in data['beans'][item]:
@@ -36,13 +64,25 @@ def generate_module_dictionary(category_to_process, data):
                     elif 'name' in str(data['beans'][item][key]):
                         module_name[item] = str(data['beans'][item][key]).split('name=')[1]
                 except:
-                    print("Some Error Occured in module_gen - But will continue for other modules")
+                    print("Some Error Occurred in module_gen - But will continue for other modules")
                     continue
 
     return module_name
 
+
+# ---------------------------------
+# Generate URL
+# ---------------------------------
 # This function converts the servername to URL which we need to query.
 def get_url(server_name, listen_port):
+    """
+        Generating URL to get the information
+        from namenode/datanode
+
+    :param server_name:
+    :param listen_port:
+    :return:
+    """
 
     if listen_port < 0:
         print ("Invalid Port")
@@ -56,11 +96,32 @@ def get_url(server_name, listen_port):
     return URL
 
 
+# ---------------------------------
+# Load URL
+# ---------------------------------
 def load_url_as_dictionary(url):
+    """
+        Loading JSON URL which we recieved from
+        namenode/datanode
+
+    :param url:
+    :return:
+    """
     # Server URL to get JSON information
     return json.load(urllib.urlopen(url))
 
+
+# ---------------------------------
+# Check value type - int/float/str
+# ---------------------------------
 def check_value_type(value):
+    """
+        Check value type so that we can process
+        them differently
+
+    :param value:
+    :return:
+    """
     if isinstance(value, int):
         return int(value)
     elif isinstance(value, float):
@@ -68,27 +129,52 @@ def check_value_type(value):
     else:
         return str(value).strip()
 
+
+# ---------------------------------
+# Processing JSON data to get key/value data
+# ---------------------------------
 def processing_json(category, json_data, module_name):
-    # Comments
+    """
+        Processing JSON data to get key/value data.
+        Key will contain the zabbix item-name
+        value JSON reponse value.
+
+        This k/v will be further processed to
+        generate XML or send data to Zabbix server.
+
+    :param category:
+    :param json_data:
+    :param module_name:
+    :return:
+    """
+
     send_value = dict()
     for item in category:
         for key in json_data['beans'][item]:
 
+            # Skip Name - as this is the Category information,
+            # which we have already processed.
             if key == 'name':
                 continue
 
+            # All data which are not dict/list.
             elif not isinstance(json_data['beans'][item][key], dict) and \
                     not isinstance(json_data['beans'][item][key], list):
                 zbx_key = re.sub('[\[\]/=*:\.,\'\"><]', '', str(module_name[item] + '_' + key).strip())
                 zbx_value = json_data['beans'][item][key]
                 send_value[zbx_key] = zbx_value
+                logging.debug("Adding Key/Value to Dictionary, Key : " + str(zbx_key) + " / Value : " + str(zbx_value))
 
+
+            # If we have dictinary then we create key/value of that dictionary.
             elif isinstance(json_data['beans'][item][key], dict):
                 for value_in_sub in json_data['beans'][item][key]:
                     zbx_key = re.sub('[\[\]/=*:\.,\'\"><]', '', str(module_name[item] + '_' + key + '_' + value_in_sub).strip())
                     zbx_value = json_data['beans'][item][key][value_in_sub]
                     send_value[zbx_key] = zbx_value
+                    logging.debug("Adding Key/Value to Dictionary, Key : " + str(zbx_key) + " / Value : " + str(zbx_value))
 
+            # This is specific processing for LiveNodes
             if key == "LiveNodes":
                 dict_v = ast.literal_eval(json_data['beans'][item][key])
                 for key_live in dict_v:
@@ -96,28 +182,83 @@ def processing_json(category, json_data, module_name):
                         zbx_key = re.sub('[\[\]/=*:\.,\'\"><]', '', str(module_name[item] + '_' + key + '_' + key_live + '_' + item_live).strip())
                         zbx_value = dict_v[key_live][item_live]
                         send_value[zbx_key] = zbx_value
+                        logging.debug("Adding Key/Value to Dictionary, Key : " + str(zbx_key) + " / Value : " + str(zbx_value))
     return send_value
 
 
+# ---------------------------------
+# Sending Data to Zabbix Server
+# ---------------------------------
 def send_data_to_zabbix(send_data_from_dict, host_name, zbx_server_ip, zbx_server_port):
+    """
+        Once we have the processed data as Key/Value pair.
+        Now we create a Metric JSON which is similar to below.
+        Using Zabbix Metric
+
+        {
+            "request":"sender data",
+            "data":[
+                    {
+                        "host":"Host name 1",
+                        "key":"item_key",
+                        "value":"33",
+                        "clock":"123123123123"
+                    },
+                    {
+                        "host":"Host name 2",
+                        "key":"item_key",
+                        "value":"55",
+                        "clock":"23423423423"
+                    }
+                ]
+            }
+
+        'Clock' is taken as the current system time when the JSON was picked up.
+
+    :param send_data_from_dict:
+    :param host_name:
+    :param zbx_server_ip:
+    :param zbx_server_port:
+    :return:
+    """
     clock = time.time()
     send_data_list = []
+
+    # Creating JSON
     for keys in send_data_from_dict:
         send_data_list.append(zbxsend.Metric(host_name, keys, send_data_from_dict[keys], clock))
 
+    logging.info("Sending Data to Zabbix Server, for Host : " + str(host_name))
+    logging.info("Zabbix IP : " + str(zabbix_server_ip))
+    logging.info("Zabbix Port : " + str(zbx_server_port))
+
+    # Sending JSON to Zabbix Server.
     zbxsend.send_to_zabbix(send_data_list, zabbix_host=zbx_server_ip, zabbix_port=zbx_server_port)
 
 
 
-# --------------------------------------------------------
-# Generate Complete Export/Import XML File
-# --------------------------------------------------------
+# ---------------------------------
+# Generate Zabbix Items
+# ---------------------------------
 def generate_items_xml_file_complete(
-                                    list_from_file,
+                                    dict_from_json_processing,
                                     host_name,
                                     host_group_name,
                                     host_interface,
-                                    item_application_name=None):
+                                    host_application_name=None):
+
+    """
+        Create Zabbix XML Import file, to create Items in the Zabbix server.
+        This is again done using the key/value pair which we generated in the process JSON phase.
+
+    :param dict_from_json_processing:
+    :param host_name:
+    :param host_group_name:
+    :param host_interface:
+    :param host_application_name:
+    :return:
+    """
+
 
     # Date format for the new file created.
     fmt = '%Y-%m-%dT%H:%M:%SZ'
@@ -205,7 +346,7 @@ def generate_items_xml_file_complete(
     interface_ref_under_interface.text = 'if1'
     sub_macro.text = '{$SNMP_COMMUNITY}'
     value.text = 'public'
-    application_name.text = item_application_name
+    application_name.text = host_application_name
 
     #
     # Processing through the list of OID from the list in the dictionary
@@ -214,17 +355,25 @@ def generate_items_xml_file_complete(
     #   Warning : There will be too many Items in the import file.
     #             BE CAREFUL WITH THE RANGE.
     #
-    for row_dict_from_file in list_from_file:
-        item_creator(row_dict_from_file, items, row_dict_from_file, item_application_name, list_from_file[row_dict_from_file])
-
+    for key_from_dict in dict_from_json_processing:
+        logging.info("Creating Item for : " + str(key_from_dict))
+        item_creator(items, key_from_dict, dict_from_json_processing[key_from_dict])
 
     return ElementTree.tostring(zabbix_export)
 
 
-def item_creator(dictionary, items, module_detail_dict_item_from_dictionary, item_application_name, value_data):
-    #
-    # Creating an initial XML Template
-    #
+# ---------------------------------
+# Creating Individual Items from the Dictionary
+# ---------------------------------
+def item_creator(items, module_detail_dict_item_from_dictionary, value_data):
+    """
+        Creating items from the Dictionary.
+
+    :param items:
+    :param module_detail_dict_item_from_dictionary:
+    :param value_data:
+    :return:
+    """
     item = SubElement(items, 'item')
     name = SubElement(item, 'name')
     type = SubElement(item, 'type')
@@ -326,7 +475,17 @@ def item_creator(dictionary, items, module_detail_dict_item_from_dictionary, ite
 
 
 
+# ---------------------------------
+# XML pretty me.
+# ---------------------------------
 def xml_pretty_me(file_name_for_prettify, string_to_prettify):
+    """
+        Creating a preety XML tab seperated.
+
+    :param file_name_for_prettify:
+    :param string_to_prettify:
+    :return:
+    """
     #
     # Open a file and write to it and we are done.
     #
@@ -345,8 +504,17 @@ def xml_pretty_me(file_name_for_prettify, string_to_prettify):
     output_file.close()
 
 
+# ---------------------------------
+# Generate Key Value pair
+# ---------------------------------
 def get_json_data_as_kv(hp_host_name, hp_host_port):
-    #
+    """
+        Generating JSON Key value pair based on the category indices.
+
+    :param hp_host_name:
+    :param hp_host_port:
+    :return:
+    """
     category_to_process = [0, 1, 4, 8, 14, 15, 16, 21, 23, 26, 27, 29]
     url_to_query = get_url(hp_host_name, hp_host_port)
     logging.debug('URL to Query : ' + url_to_query)
@@ -359,8 +527,14 @@ def get_json_data_as_kv(hp_host_name, hp_host_port):
 
     return ready_dictionary
 
+
+# ---------------------------------
+# Main Function
+# ---------------------------------
 if __name__ == "__main__":
 
+    # Setting Log Level
+    logging.basicConfig(level=logging.INFO)
 
     # create the top-level parser
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent('''
@@ -404,8 +578,11 @@ if __name__ == "__main__":
     str_help_send = '-hh hmhdmaster1 -zh hmhdmaster1 send-data --help'.split()
 
 
-    args = parser.parse_args(str_help_xml)
+    args = parser.parse_args()
 
+    #
+    # TODO : Dirty code to check 'SEND' or 'Create XML'.
+    #
     type_proc = ''
     try:
         if args.zabbix_server_ip:
@@ -414,7 +591,7 @@ if __name__ == "__main__":
         if args.zabbix_host_port:
             type_proc = 'XML'
 
-
+    # Send Data to Zabbix
     if type_proc == 'SEND':
         hadoop_host_name = args.hadoop_host_name
         hadoop_host_port = args.hadoop_host_port
@@ -426,6 +603,7 @@ if __name__ == "__main__":
         #send_data_from_dict, host_name, zbx_server_ip, zbx_server_port
         send_data_to_zabbix(key_value_pairs, str(zabbix_host_name), str(zabbix_server_ip), int(zabbix_port))
 
+    # Create Item for Zabbix (Export.xml)
     elif type_proc == 'XML':
         hadoop_host_name = args.hadoop_host_name
         hadoop_host_port = args.hadoop_host_port
@@ -440,5 +618,7 @@ if __name__ == "__main__":
                                                       zabbix_host_group, zabbix_host_interface,
                                                       zabbix_host_application)
         xml_pretty_me(str(zabbix_host_name).lower() + '_' + zabbix_host_interface + '_export.xml', xml_string)
+
+    # Should not reach here.
     else:
         parser.print_help()
