@@ -47,6 +47,25 @@ OR
                     --zabbix-host-interface 10.20.6.31 --zabbix-host-group Linux_Server \
                     --zabbix-host-application hadoop
 
+#### Step 1.1 Create Host in Zabbix. 
+
+    Example : hmhdmaster1
+
+![alt text](./images/Create_Host.PNG "Create Host")
+
+#### Step 1.2 Create Application for this (hmhdmaster1) Host in Zabbix. 
+
+    Example : Memory, RpcActivityForPort8020 ... All the above list.
+
+![alt text](./images/Create_Application.PNG "Create Application")
+
+#### Step 1.3 Import XML create Above, select only below options while importing.
+
+1. Groups, 
+2. Hosts, 
+3. Items, 
+4. Triggers.
+
 
 ### Step 2 : Sending Data to Zabbix Server.
 
