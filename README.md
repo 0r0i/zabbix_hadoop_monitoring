@@ -51,13 +51,13 @@ OR
 
     Example : hmhdmaster1
 
-![alt text](./images/Create_Host.PNG "Create Host")
+![Create Host](./images/Create_Host.PNG "Create Host")
 
 #### Step 1.2 Create Application for this (hmhdmaster1) Host in Zabbix. 
 
     Example : Memory, RpcActivityForPort8020 ... All the above list.
 
-![alt text](./images/Create_Application.PNG "Create Application")
+![Create Application](./images/Create_Application.PNG "Create Application")
 
 #### Step 1.3 Import XML create Above, select only below options while importing.
 
@@ -66,6 +66,7 @@ OR
 3. Items, 
 4. Triggers.
 
+![Import XML FIle](./images/Import_XML.PNG "Import XML File")
 
 ### Step 2 : Sending Data to Zabbix Server.
 
