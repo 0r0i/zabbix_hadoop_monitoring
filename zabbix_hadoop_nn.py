@@ -177,7 +177,7 @@ def processing_json(category, json_data, module_name):
                                         str(zbx_key) + " / Value : " + str(zbx_value))
 
             # This is specific processing for LiveNodes
-            if key == "LiveNodes":
+            if key == "LiveNodes" or key == "VolumeInfo":
                 dict_v = ast.literal_eval(json_data['beans'][item][key])
                 for key_live in dict_v:
                     for item_live in dict_v[key_live]:
@@ -509,9 +509,45 @@ def xml_pretty_me(file_name_for_prettify, string_to_prettify):
 
 
 # ---------------------------------
+# Read Properties file to generate Catagory List.
+# ---------------------------------
+def read_properties_file(file_name):
+    """
+        This function is used to create the category list.
+        Check properties files for more information.
+
+        These categories are modules in the JSON we get from Namenode/Datanode.
+
+    :param file_name:
+    :return:
+    """
+    file_reader = open(file_name, 'r+')
+    catagory_list = []
+
+    for line in file_reader:
+         # Skip Empty Lines from property file.
+        if line in ['\n', '\r\n']:
+            continue
+
+        line = line.strip()
+
+        #
+        # Checking for property file comments
+        # Currently property file comments are '#'
+        #
+        if line[0] != "#":
+
+            line_split = line.split(":")
+            # Create a {} to store.
+            catagory_list.append(int(line_split[0]))
+
+    return catagory_list
+
+
+# ---------------------------------
 # Generate Key Value pair
 # ---------------------------------
-def get_json_data_as_kv(hp_host_name, hp_host_port):
+def get_json_data_as_kv(hp_host_name, hp_host_port, properties_file):
     """
         Generating JSON Key value pair based on the category indices.
 
@@ -519,7 +555,7 @@ def get_json_data_as_kv(hp_host_name, hp_host_port):
     :param hp_host_port:
     :return:
     """
-    category_to_process = [0, 1, 4, 8, 14, 15, 16, 21, 23, 26, 27, 29]
+    category_to_process = read_properties_file(properties_file)
     url_to_query = get_url(hp_host_name, hp_host_port)
     logging.debug('URL to Query : ' + url_to_query)
 
@@ -554,14 +590,17 @@ if __name__ == "__main__":
     2. Send monitoring data to Zabbix server.
 
     Parameter which are monitored are in the indexes of the JSON and are as below.
-    category_to_process = [0, 1, 4, 8, 14, 15, 16, 21, 23, 26, 27, 29]
+    category_to_process = Taken from the properties file namenode/datanode.properties
 
     ----------------------'''))
 
-    parser.add_argument('-hh', '--hadoop-host-name', help='Hadoop Hostname/IP to connect to get JSON file.')
+    parser.add_argument('-hh', '--hadoop-host-name',
+                                help='Hadoop Hostname/IP to connect to get JSON file.', required=True)
     parser.add_argument('-hp', '--hadoop-host-port', default=50070,
-                                help='Hadoop Hostname/IP Port to connect to. (default=50070)')
-    parser.add_argument('-zh', '--zabbix-host-name', help='Hostname as in the Zabbix server.')
+                                help='Hadoop Hostname/IP Port to connect to. (default=50070)', required=True)
+    parser.add_argument('-zh', '--zabbix-host-name', help='Hostname as in the Zabbix server.', required=True)
+    parser.add_argument('-p', '--properties-file',
+                                help='Select properties file to process, Namenode or Datanode', required=True)
 
     subparsers = parser.add_subparsers(help='sub-command help')
 
@@ -583,13 +622,13 @@ if __name__ == "__main__":
     parser_b.add_argument('-zi', '--zabbix-server-ip', help='Zabbix server IP to send the Data to.', required=True)
 
     str_cmd = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 send-data -zp 10051 -zi 10.231.67.201'.split()
-    str_cmd2 = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 xml-gen -zp 10050 ' \
+    str_cmd2 = '-hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 -p namenode.properties xml-gen -zp 10050 ' \
                '-zi 10.20.6.31 -zg Linux_Server -za hadoop'.split()
     str_help_xml = '-hh hmhdmaster1 -zh hmhdmaster1 xml-gen --help'.split()
     str_help_send = '-hh hmhdmaster1 -zh hmhdmaster1 send-data --help'.split()
 
 
-    args = parser.parse_args()
+    args = parser.parse_args(['-h'])
 
     #
     # TODO : Dirty code to check 'SEND' or 'Create XML'.
@@ -604,27 +643,41 @@ if __name__ == "__main__":
 
     # Send Data to Zabbix
     if type_proc == 'SEND':
+        # Common Parameters
         hadoop_host_name = args.hadoop_host_name
         hadoop_host_port = args.hadoop_host_port
         zabbix_host_name = args.zabbix_host_name
+        node_properties = args.properties_file
+
+        # Paramete to send the data to.
         zabbix_port = args.zabbix_port
         zabbix_server_ip = args.zabbix_server_ip
 
-        key_value_pairs = get_json_data_as_kv(hadoop_host_name, hadoop_host_port)
-        #send_data_from_dict, host_name, zbx_server_ip, zbx_server_port
+        # Generating k/v pairs
+        key_value_pairs = get_json_data_as_kv(hadoop_host_name, hadoop_host_port, node_properties)
+
+        # Send data
         send_data_to_zabbix(key_value_pairs, str(zabbix_host_name), str(zabbix_server_ip), int(zabbix_port))
 
     # Create Item for Zabbix (Export.xml)
     elif type_proc == 'XML':
+
+        # Common Parameters
         hadoop_host_name = args.hadoop_host_name
         hadoop_host_port = args.hadoop_host_port
         zabbix_host_name = args.zabbix_host_name
+        node_properties = args.properties_file
+
+        # XML specific Parameters
         zabbix_host_port = args.zabbix_host_port
         zabbix_host_interface = args.zabbix_host_interface
         zabbix_host_group = args.zabbix_host_group
         zabbix_host_application = args.zabbix_host_application
 
-        key_value_pairs = get_json_data_as_kv(hadoop_host_name, hadoop_host_port)
+        # Create k/v pairs
+        key_value_pairs = get_json_data_as_kv(hadoop_host_name, hadoop_host_port, node_properties)
+
+        # Generate XML file.
         xml_string = generate_items_xml_file_complete(key_value_pairs, zabbix_host_name,
                                                       zabbix_host_group, zabbix_host_interface,
                                                       zabbix_host_application)

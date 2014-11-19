@@ -39,13 +39,14 @@ Still looking into creating application using the XML file, till then this will 
 
 Now to generate the xml file we will need the below command.
 
-    python <file>.py -hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 xml-gen -zp 10050 -zi 10.20.6.31 -zg Linux_Server -za hadoop
+    python <file>.py -hh hmhdmaster1 -hp 50070 -zh hmhdmaster1  -p namenode.properties \
+                     xml-gen -zp 10050 -zi 10.20.6.31 -zg Linux_Server -za hadoop
 OR   
  
     python <file>.py --hadoop-host-name hmhdmaster1 --hadoop-host-port 50070 \
-                    --zabbix-host-name hmhdmaster1 xml-gen --zabbix-host-port 10050 \
-                    --zabbix-host-interface 10.20.6.31 --zabbix-host-group Linux_Server \
-                    --zabbix-host-application hadoop
+                    --zabbix-host-name hmhdmaster1 --properties-file namenode.properties \
+                    xml-gen --zabbix-host-port 10050 --zabbix-host-interface 10.20.6.31 \
+                    --zabbix-host-group Linux_Server --zabbix-host-application hadoop
 
 #### Step 1.1 Create Host in Zabbix. 
 
@@ -59,7 +60,17 @@ OR
 
 ![Create Application](./images/Create_Application.PNG "Create Application")
 
-#### Step 1.3 Import XML create Above, select only below options while importing.
+#### Step 1.3 Updating properties file [if required (As of now can be left alone)]
+
+[OPTIONAL]
+
+1. Information before ':' is used to create the category list.
+2. Also '#' in the begining of the file is treated as comment line.
+3. Lines without any information are ignored.
+
+![Updating Properties File](./images/Properties_file.PNG "Update Properties File")
+
+#### Step 1.4 Import XML create Above, select only below options while importing.
 
 1. Groups, 
 2. Hosts, 
@@ -73,21 +84,23 @@ OR
 Once we have created all the Items in the server.
 Then we need send data to those items. 
 
-    python <file>.py -hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 send-data -zp 10051 -zi 10.231.67.201
+    python <file>.py -hh hmhdmaster1 -hp 50070 -zh hmhdmaster1 -p namenode.properties \
+                        send-data -zp 10051 -zi 10.231.67.201
 OR
 
     python <file>.py --hadoop-host-name hmhdmaster1 --hadoop-host-port 50070 \
-                     --zabbix-host-name hmhdmaster1 --zabbix-port 10051 \
+                     --zabbix-host-name hmhdmaster1 --properties-file namenode.properties --zabbix-port 10051 \
                      --zabbix-server-ip 10.231.67.201
     
     
 ## Usage
+
     usage: zabbix_hadoop_nn.py [-h] -hh HADOOP_HOST_NAME -hp HADOOP_HOST_PORT -zh
-                               ZABBIX_HOST_NAME
+                               ZABBIX_HOST_NAME -p PROPERTIES_FILE
                                {xml-gen,send-data} ...
     
     Namenode Zabbix Monitoring
-    
+    ----------------------
     
     This script can be used to monitor Namenode Parameters.
     This script can be used to
@@ -96,7 +109,7 @@ OR
     2. Send monitoring data to Zabbix server.
     
     Parameter which are monitored are in the indexes of the JSON and are as below.
-    category_to_process = [0, 1, 4, 8, 14, 15, 16, 21, 23, 26, 27, 29]
+    category_to_process = Taken from the properties file namenode/datanode.properties
     
     ----------------------
     
@@ -110,9 +123,14 @@ OR
       -hh HADOOP_HOST_NAME, --hadoop-host-name HADOOP_HOST_NAME
                             Hadoop Hostname/IP to connect to get JSON file.
       -hp HADOOP_HOST_PORT, --hadoop-host-port HADOOP_HOST_PORT
-                            Hadoop Hostname/IP Port to connect to.
+                            Hadoop Hostname/IP Port to connect to. (default=50070)
       -zh ZABBIX_HOST_NAME, --zabbix-host-name ZABBIX_HOST_NAME
                             Hostname as in the Zabbix server.
+      -p PROPERTIES_FILE, --properties-file PROPERTIES_FILE
+                            Select properties file to process, Namenode or
+                            Datanode
+        
+
 
 ###SubCommand Option 'send-data'
 
