@@ -52,13 +52,13 @@ OR
 
     Example : hmhdmaster1
 
-![Create Host](./images/Create_Host.PNG "Create Host")
+![Create Host](./images/hadoop_monitoring_create_host.png "Create Host")
 
 #### Step 1.2 Create Application for this (hmhdmaster1) Host in Zabbix. 
 
     Example : Memory, RpcActivityForPort8020 ... All the above list.
 
-![Create Application](./images/Create_Application.PNG "Create Application")
+![Create Application](./images/hadoop_monitoring_create_application.png "Create Application")
 
 #### Step 1.3 Updating properties file [if required (As of now can be left alone)]
 
@@ -68,7 +68,7 @@ OR
 2. Also '#' in the begining of the file is treated as comment line.
 3. Lines without any information are ignored.
 
-![Updating Properties File](./images/Properties_File.PNG "Update Properties File")
+![Updating Properties File](./images/hadoop_monitoring_properties_file.png "Update Properties File")
 
 #### Step 1.4 Import XML create Above, select only below options while importing.
 
@@ -77,7 +77,7 @@ OR
 3. Items, 
 4. Triggers.
 
-![Import XML FIle](./images/Import_XML.PNG "Import XML File")
+![Import XML FIle](./images/hadoop_monitoring_import_xml.png "Import XML File")
 
 ### Step 2 : Sending Data to Zabbix Server.
 
