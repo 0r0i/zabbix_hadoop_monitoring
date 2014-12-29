@@ -6,6 +6,8 @@ NOTE : THIS IS ORIGINALLY FROM MIKOOMI TEMPLATES : https://code.google.com/p/mik
 I HAVE ADDED A PYTHON SCRIPT TO GET THE VALUES FROM JMX, RATHER THAN FROM PARSING THE HTML WHICH WAS DONE ORIGINALLY. 
 FOLLOW THE WIKI ON MIKOOMI ITS CLEARER : https://code.google.com/p/mikoomi/wiki/05
 
+PS : ONLY DIFFERENCE IN SETUP IS THAT YOU NEED TO INCLUDE THE `zabbix_hadoop_nn_mikoomi.py` SCRIPT WHEREEVER YOU PUT THE SHELL SCRIPTS.
+
 ==Overview==
 
 The *Apache Hadoop Plugin* can be used to monitor Namenode and Jobtracker of a Hadoop Cluster. [http://hadoop.apache.org Hadoop] is the leading and defacto distributed big data processing system "out there". While it is used by companies like Yahoo (who supposedly have the largest Hadoop cluster), Facebook, Groupon to name a few, there seems to be only two monitoring solution out there - [http://wiki.apache.org/hadoop/GangliaMetrics Ganglia] and [http://opentsdb.net/ openTSDB]. As you read the documentation, you will realize that the two monitoring solutions are very tightly coupled to Hadoop and are very sensitive about its version, libraries, etc.
