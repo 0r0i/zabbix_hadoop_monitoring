@@ -2,8 +2,9 @@
 
 =Apache Hadoop Plugin=
 
-*NOTE : This is originally from Mikoomi Templates : https://code.google.com/p/mikoomi/wiki/05* .
-*I HAVE ADDED A PYTHON SCRIPT TO GET THE VALUES FROM JMX, RATHER THAN FROM PARSING THE HTML WHICH WAS DONE ORIGINALLY.* 
+NOTE : THIS IS ORIGINALLY FROM MIKOOMI TEMPLATES : https://code.google.com/p/mikoomi/ .
+I HAVE ADDED A PYTHON SCRIPT TO GET THE VALUES FROM JMX, RATHER THAN FROM PARSING THE HTML WHICH WAS DONE ORIGINALLY. 
+FOLLOW THE WIKI ON MIKOOMI ITS CLEARER : https://code.google.com/p/mikoomi/wiki/05
 
 ==Overview==
 
