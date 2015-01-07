@@ -3,6 +3,7 @@ __author__ = 'ahmed'
 import json
 import urllib
 import logging
+import sys
 
 
 # ---------------------------------
@@ -232,8 +233,22 @@ def usage():
 def min_value_display(x):
     return '{0:.5f}'.format(x)
 
-logging.basicConfig(level=logging.DEBUG)
-json_processed = json_processing(temp_json_loading())
-write_data_to_file(json_processed, 'file.txt', 'hadoop_namenode')
 
+if __name__ == '__main__':
+
+    logging.basicConfig(level=logging.INFO)
+    if len(sys.argv) == 5:
+
+        namenode_name = sys.argv[1]
+        namenode_listen_port = sys.argv[2]
+        file_path = sys.argv[3]
+        nodename_in_zabbix = sys.argv[4]
+
+        url = get_url(namenode_name, namenode_listen_port)
+        json_as_dictionary = load_url_as_dictionary(url)
+        json_processed = json_processing(json_as_dictionary)
+        write_data_to_file(json_processed, file_path, nodename_in_zabbix)
+
+    else:
+        usage()
 
