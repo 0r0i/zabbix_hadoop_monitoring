@@ -1,4 +1,31 @@
+
+<a name="Zabbix Hadoop Monitoring"></a>
+
 #Zabbix Hadoop Monitoring
+
+
+---
+
+Table of Contents
+
+1. <a href="#Namenode Zabbix Monitoring">Namenode Zabbix Monitoring</a>
+2. <a href="#Working with the script.">Working with the script.</a>
+	 * <a href="#Step 1 : Generating Zabbix Import XML file.">Step 1 : Generating Zabbix Import XML file.</a>
+	 * <a href="#Step 1.1 Create Host in Zabbix.">Step 1.1 Create Host in Zabbix.</a>
+	 * <a href="#Step 1.2 Create Application for this (hmhdmaster1) Host in Zabbix.">Step 1.2 Create Application for this (hmhdmaster1) Host in Zabbix.</a>
+	 * <a href="#Step 1.3 Updating properties file [if required (As of now can be left alone)]">Step 1.3 Updating properties file [if required (As of now can be left alone)]</a>
+	 * <a href="#Step 1.4 Import XML create Above, select only below options while importing.">Step 1.4 Import XML create Above, select only below options while importing.</a>
+	 * <a href="#Step 2 : Sending Data to Zabbix Server.">Step 2 : Sending Data to Zabbix Server.</a>
+3. <a href="#Usage">Usage</a>
+	 * <a href="#SubCommand Option 'send-data'">SubCommand Option 'send-data'</a>
+	 * <a href="#SubCommand Option 'xml-gen'">SubCommand Option 'xml-gen'</a>
+	 * <a href="#Code Location">Code Location</a>
+
+---
+
+
+
+<a name="Namenode Zabbix Monitoring"></a>
 
 ##Namenode Zabbix Monitoring
 
@@ -11,7 +38,13 @@ This script can be used to
 Parameter which are monitored are in the indexes of the JSON and are as below.
 category_to_process = [0, 1, 4, 8, 14, 15, 16, 21, 23, 26, 27, 29]
 
+
+<a name="Working with the script."></a>
+
 ## Working with the script.
+
+
+<a name="Step 1 : Generating Zabbix Import XML file."></a>
 
 ### Step 1 : Generating Zabbix Import XML file.
 
@@ -48,17 +81,26 @@ OR
                     xml-gen --zabbix-host-port 10050 --zabbix-host-interface 10.20.6.31 \
                     --zabbix-host-group Linux_Server --zabbix-host-application hadoop
 
+
+<a name="Step 1.1 Create Host in Zabbix."></a>
+
 #### Step 1.1 Create Host in Zabbix. 
 
     Example : hmhdmaster1
 
 ![Create Host](./images/hadoop_monitoring_create_host.png "Create Host")
 
+
+<a name="Step 1.2 Create Application for this (hmhdmaster1) Host in Zabbix."></a>
+
 #### Step 1.2 Create Application for this (hmhdmaster1) Host in Zabbix. 
 
     Example : Memory, RpcActivityForPort8020 ... All the above list.
 
 ![Create Application](./images/hadoop_monitoring_create_application.png "Create Application")
+
+
+<a name="Step 1.3 Updating properties file [if required (As of now can be left alone)]"></a>
 
 #### Step 1.3 Updating properties file [if required (As of now can be left alone)]
 
@@ -70,6 +112,9 @@ OR
 
 ![Updating Properties File](./images/hadoop_monitoring_properties_file.png "Update Properties File")
 
+
+<a name="Step 1.4 Import XML create Above, select only below options while importing."></a>
+
 #### Step 1.4 Import XML create Above, select only below options while importing.
 
 1. Groups, 
@@ -78,6 +123,9 @@ OR
 4. Triggers.
 
 ![Import XML FIle](./images/hadoop_monitoring_import_xml.png "Import XML File")
+
+
+<a name="Step 2 : Sending Data to Zabbix Server."></a>
 
 ### Step 2 : Sending Data to Zabbix Server.
 
@@ -93,6 +141,9 @@ OR
                      --zabbix-server-ip 10.231.67.201
     
     
+
+<a name="Usage"></a>
+
 ## Usage
 
     usage: zabbix_hadoop_nn.py [-h] -hh HADOOP_HOST_NAME -hp HADOOP_HOST_PORT -zh
@@ -132,6 +183,9 @@ OR
         
 
 
+
+<a name="SubCommand Option 'send-data'"></a>
+
 ###SubCommand Option 'send-data'
 
     usage: zabbix_hadoop_nn.py send-data [-h] [-zp ZABBIX_PORT] -zi
@@ -143,6 +197,9 @@ OR
                             Zabbix port for sending data, default=10051
       -zi ZABBIX_SERVER_IP, --zabbix-server-ip ZABBIX_SERVER_IP
                             Zabbix server IP to send the Data to.
+
+
+<a name="SubCommand Option 'xml-gen'"></a>
 
 ###SubCommand Option 'xml-gen'
 
@@ -164,6 +221,8 @@ OR
                             Host Application as in the Zabbix server. (Monitoring
                             host)
                             
+
+<a name="Code Location"></a>
+
 ### Code Location 
 Code can be found here : <https://github.com/zubayr/zabbix_hadoop_monitoring>
-
