@@ -10,12 +10,12 @@ Table of Contents
 
 1. <a href="#Namenode Zabbix Monitoring">Namenode Zabbix Monitoring</a>
 2. <a href="#Working with the script.">Working with the script.</a>
-	 * <a href="#Step 1 : Generating Zabbix Import XML file.">Step 1 : Generating Zabbix Import XML file.</a>
+	 * <a href="#Step 1 - Generating Zabbix Import XML file.">Step 1 - Generating Zabbix Import XML file.</a>
 	 * <a href="#Step 1.1 Create Host in Zabbix.">Step 1.1 Create Host in Zabbix.</a>
 	 * <a href="#Step 1.2 Create Application for this (hmhdmaster1) Host in Zabbix.">Step 1.2 Create Application for this (hmhdmaster1) Host in Zabbix.</a>
 	 * <a href="#Step 1.3 Updating properties file [if required (As of now can be left alone)]">Step 1.3 Updating properties file [if required (As of now can be left alone)]</a>
 	 * <a href="#Step 1.4 Import XML create Above, select only below options while importing.">Step 1.4 Import XML create Above, select only below options while importing.</a>
-	 * <a href="#Step 2 : Sending Data to Zabbix Server.">Step 2 : Sending Data to Zabbix Server.</a>
+	 * <a href="#Step 2 - Sending Data to Zabbix Server.">Step 2 - Sending Data to Zabbix Server.</a>
 3. <a href="#Usage">Usage</a>
 	 * <a href="#SubCommand Option 'send-data'">SubCommand Option 'send-data'</a>
 	 * <a href="#SubCommand Option 'xml-gen'">SubCommand Option 'xml-gen'</a>
@@ -44,9 +44,9 @@ category_to_process = [0, 1, 4, 8, 14, 15, 16, 21, 23, 26, 27, 29]
 ## Working with the script.
 
 
-<a name="Step 1 : Generating Zabbix Import XML file."></a>
+<a name="Step 1 - Generating Zabbix Import XML file."></a>
 
-### Step 1 : Generating Zabbix Import XML file.
+### Step 1 - Generating Zabbix Import XML file.
 
 We need this file to create items in Zabbix.
 We are currently creating Items as in the subcategories above [0, 1, 4, 8, 14, 15, 16, 21, 23, 26, 27, 29]. 
@@ -125,9 +125,9 @@ OR
 ![Import XML FIle](./images/hadoop_monitoring_import_xml.png "Import XML File")
 
 
-<a name="Step 2 : Sending Data to Zabbix Server."></a>
+<a name="Step 2 - Sending Data to Zabbix Server."></a>
 
-### Step 2 : Sending Data to Zabbix Server.
+### Step 2 - Sending Data to Zabbix Server.
 
 Once we have created all the Items in the server.
 Then we need send data to those items. 
@@ -226,3 +226,4 @@ OR
 
 ### Code Location 
 Code can be found here : <https://github.com/zubayr/zabbix_hadoop_monitoring>
+
